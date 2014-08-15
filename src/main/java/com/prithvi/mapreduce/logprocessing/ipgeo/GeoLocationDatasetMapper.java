@@ -1,5 +1,6 @@
 package com.prithvi.mapreduce.logprocessing.ipgeo;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -38,8 +39,8 @@ public class GeoLocationDatasetMapper extends
 
 		Configuration conf = context.getConfiguration();
 		String database_path = conf.get("maxmind.geo.database.file");
-
-		cl = new LookupService(database_path, LookupService.GEOIP_MEMORY_CACHE
+		File file = new File(database_path);
+		cl = new LookupService(file, LookupService.GEOIP_MEMORY_CACHE
 				| LookupService.GEOIP_CHECK_CACHE);
 
 	}

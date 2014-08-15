@@ -1,5 +1,7 @@
 package com.prithvi.mapreduce.logprocessing.ipgeo;
 
+import java.net.URI;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -33,6 +35,8 @@ public class GeoLocationDatasetDriver extends Configured implements Tool {
 		Job job = Job.getInstance(conf);
 		String dbfile = args[2];
 		conf.set("maxmind.geo.database.file", dbfile);
+		job.addCacheFile(new URI(conf.get("fs.defaultFS") + "/" + conf.get("maxmind.geo.database.file") + "#" + conf.get("maxmind.geo.database.file")));
+		
 		// job.addCacheFile(new Path(args[2]).toUri()); Use for distributed
 		// cache
 
