@@ -16,8 +16,9 @@ public class GeoLocationDatasetMapper extends
 		Mapper<Text, LogWritable, NullWritable, Text> {
 
 	Text data = new Text();
-	String ipLocation;
-	LookupService cl;
+	String ipCountry = null;
+	String ipCity = null;
+	LookupService cl = null;
 
 	public void setup(Context context) throws IOException {
 		// URI[] uriList = DistributedCache.getCacheFiles(
@@ -38,18 +39,29 @@ public class GeoLocationDatasetMapper extends
 		// String database_path = uriList[0].getName();
 
 		Configuration conf = context.getConfiguration();
-		String database_path = conf.get("maxmind.geo.database.file");
+		String database_path = conf.get("maxmind.geo.database.file").toString();
 		File file = new File(database_path);
-		cl = new LookupService(file, LookupService.GEOIP_MEMORY_CACHE
-				| LookupService.GEOIP_CHECK_CACHE);
+		 //cl = new LookupService(conf.get("maxmind.geo.database.file"),
+			    //LookupService.GEOIP_MEMORY_CACHE | LookupService.GEOIP_CHECK_CACHE);
+		
+		cl = new LookupService(file);
 
 	}
 
 	public void map(Text key, LogWritable value, Context context)
 			throws IOException, InterruptedException {
 		Location location = cl.getLocation(value.getOriginatingIP().toString());
-		ipLocation = location.countryName;
-		data.set(value.toString() + " " + ipLocation);
+		if (location !=null)
+		{
+			ipCountry = location.countryName;
+		ipCity = location.city;
+	}
+		else
+		{
+			ipCountry ="Unknown";
+			ipCity = "Unknown";
+	}
+		data.set(value.toString() + " " + ipCountry+":"+ipCity);
 
 		context.write(NullWritable.get(), data);
 	}

@@ -25,18 +25,28 @@ public class GeoLocationDatasetDriver extends Configured implements Tool {
 
 	public int run(String[] args) throws Exception {
 
-		/*
-		 * if (args.length != 3) { System.err
-		 * .println("Usage: GeoLocationDatasetDriver <in> <out> <cache>");
-		 * System.exit(2); }
-		 */
+		if (args.length != 3) {
+			System.err
+					.println("Usage: GeoLocationDatasetDriver <-files cache> <in> <out>");
+			System.exit(2);
+		}
 
 		Configuration conf = getConf();
-		Job job = Job.getInstance(conf);
 		String dbfile = args[2];
 		conf.set("maxmind.geo.database.file", dbfile);
-		job.addCacheFile(new URI(conf.get("fs.defaultFS") + "/" + conf.get("maxmind.geo.database.file") + "#" + conf.get("maxmind.geo.database.file")));
-		
+
+		Job job = Job.getInstance(conf);
+		job.addCacheFile(new URI(conf.get("fs.defaultFS") + "/"
+				+ conf.get("maxmind.geo.database.file") + "#"
+				+ conf.get("maxmind.geo.database.file")));
+
+		URI[] cacheFiles = job.getCacheFiles();
+		if (cacheFiles != null) {
+			for (URI cachefile : cacheFiles) {
+				System.out.println("Cache file ------>" + cachefile);
+			}
+		}
+
 		// job.addCacheFile(new Path(args[2]).toUri()); Use for distributed
 		// cache
 
@@ -50,7 +60,7 @@ public class GeoLocationDatasetDriver extends Configured implements Tool {
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
 		job.setInputFormatClass(LogInputFormat.class);
-		job.setNumReduceTasks(0);
+		// job.setNumReduceTasks(0); This job uses default Identity Reducer
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 

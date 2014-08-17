@@ -1,6 +1,7 @@
 package com.prithvi.pig.logprocessing.customreader;
 
 import java.io.IOException;
+
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -42,21 +43,21 @@ public class WebLogLoader extends LoadFunc {
 		Tuple t = null;
 		try {
 			if (!reader.nextKeyValue()) return null;
-			lw = reader.getCurrentValue();
+			lw = (LogWritable)reader.getCurrentValue();
 			
 			t = tf.newTuple(11);
 			
-			t.set(0, lw.getOriginatingIP());
-			t.set(1, lw.getClientIdentity());
-			t.set(2, lw.getUserId());
-			t.set(3, lw.getTimeStamp());
-			t.set(4, lw.getRequestType());
-			t.set(5, lw.getRequestPage());
-			t.set(6, lw.getHttpProtocolVersion());
+			t.set(0, lw.getOriginatingIP().toString());
+			t.set(1, lw.getClientIdentity().toString());
+			t.set(2, lw.getUserId().toString());
+			t.set(3, lw.getTimeStamp().toString());
+			t.set(4, lw.getRequestType().toString());
+			t.set(5, lw.getRequestPage().toString());
+			t.set(6, lw.getHttpProtocolVersion().toString());
 			t.set(7, lw.getResponseCode());
 			t.set(8, lw.getResponseSize());
-			t.set(9, lw.getReferrer());
-			t.set(10, lw.getUserAgent());
+			t.set(9, lw.getReferrer().toString());
+			t.set(10, lw.getUserAgent().toString());
 			
 		} 
 		catch (InterruptedException e) {
